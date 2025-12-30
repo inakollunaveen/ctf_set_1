@@ -85,7 +85,9 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
 
       {/* Description */}
       <div className="bg-muted/50 rounded-xl p-4 mb-4 font-mono text-sm">
-        <code className="text-foreground">{question.description}</code>
+        {question.description.split('\n').map((line, i) => (
+          <p key={i} className="text-foreground">{line}</p>
+        ))}
       </div>
 
       {/* Hint Toggle */}
