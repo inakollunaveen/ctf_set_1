@@ -9,9 +9,11 @@ interface QuestionCardProps {
   index: number;
   attempt?: { answer: string; correct: boolean };
   onSubmit: (questionId: string, answer: string) => void;
+  isLocked?: boolean;
+  isChoice?: boolean;
 }
 
-const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps) => {
+const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, isChoice = false }: QuestionCardProps) => {
   const [answer, setAnswer] = useState(attempt?.answer || "");
   const [showHint, setShowHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +34,9 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
   return (
     <div
       className={`ctf-card p-6 transition-all duration-300 animate-slide-up ${
-        isCorrect
+        isLocked
+          ? "opacity-60 bg-muted/30"
+          : isCorrect
           ? "ring-2 ring-primary/50 bg-primary/5"
           : isAttempted
           ? "ring-2 ring-destructive/30 bg-destructive/5"
@@ -61,11 +65,19 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
             )}
           </div>
           <div>
-            <h3 className="font-semibold text-lg text-foreground">
-              Round {index + 1}: {question.title}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-lg text-foreground">
+                Round {index + 1}: {question.title}
+              </h3>
+              {isChoice && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-accent/20 text-accent-foreground">
+                  Choice
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {question.points} points
+              {isLocked && " • 🔒 Complete previous round to unlock"}
             </p>
           </div>
         </div>
@@ -110,27 +122,34 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
       )}
 
       {/* Answer Form */}
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <Input
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Enter your answer..."
-          className="flex-1 bg-background border-border focus:ring-primary"
-          disabled={isSubmitting}
-        />
-        <Button
-          type="submit"
-          disabled={!answer.trim() || isSubmitting}
-          className="gap-2"
-        >
-          {isSubmitting ? (
-            <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-          Submit
-        </Button>
-      </form>
+      {isLocked ? (
+        <div className="flex items-center justify-center p-4 bg-muted/30 rounded-xl text-muted-foreground">
+          <Lock className="h-5 w-5 mr-2" />
+          <span>Complete previous round to unlock this question</span>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="flex gap-3">
+          <Input
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            placeholder="Enter your answer..."
+            className="flex-1 bg-background border-border focus:ring-primary"
+            disabled={isSubmitting}
+          />
+          <Button
+            type="submit"
+            disabled={!answer.trim() || isSubmitting}
+            className="gap-2"
+          >
+            {isSubmitting ? (
+              <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+            Submit
+          </Button>
+        </form>
+      )}
     </div>
   );
 };

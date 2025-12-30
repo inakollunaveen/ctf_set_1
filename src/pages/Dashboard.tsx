@@ -229,15 +229,34 @@ const Dashboard = () => {
 
         {/* Questions List */}
         <div className="flex flex-col gap-6 max-w-3xl mx-auto">
-          {QUESTIONS.map((question, index) => (
-            <QuestionCard
-              key={question.id}
-              question={question}
-              index={index}
-              attempt={player.attempts[question.id]}
-              onSubmit={handleSubmit}
-            />
-          ))}
+          {/* Info about choice rounds */}
+          <div className="text-center text-muted-foreground text-sm mb-2">
+            Complete Round 1 → Unlock Round 2 → Unlock Rounds 3 & 4 (Choose any one)
+          </div>
+          
+          {QUESTIONS.map((question, index) => {
+            // Unlock logic: R1 always open, R2 after R1 correct, R3 & R4 after R2 correct
+            const r1Correct = player.attempts["r1"]?.correct;
+            const r2Correct = player.attempts["r2"]?.correct;
+            
+            let isLocked = false;
+            if (index === 1) isLocked = !r1Correct; // Round 2
+            if (index === 2 || index === 3) isLocked = !r2Correct; // Round 3 & 4
+            
+            const isChoice = index === 2 || index === 3; // Round 3 & 4 are choice
+            
+            return (
+              <QuestionCard
+                key={question.id}
+                question={question}
+                index={index}
+                attempt={player.attempts[question.id]}
+                onSubmit={handleSubmit}
+                isLocked={isLocked}
+                isChoice={isChoice}
+              />
+            );
+          })}
         </div>
 
         {/* Finish Button */}
