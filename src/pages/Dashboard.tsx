@@ -227,8 +227,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Questions Grid */}
-        <div className="grid gap-6 md:grid-cols-2">
+        {/* Questions List */}
+        <div className="flex flex-col gap-6 max-w-3xl mx-auto">
           {QUESTIONS.map((question, index) => (
             <QuestionCard
               key={question.id}
