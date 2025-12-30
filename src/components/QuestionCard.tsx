@@ -84,7 +84,7 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
       </div>
 
       {/* Description */}
-      <div className="bg-muted/50 rounded-xl p-4 mb-4 font-mono text-sm font-medium">
+      <div className="bg-muted/50 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
         {question.description.split('\n').map((line, i) => (
           <p key={i} className="text-foreground">{line}</p>
         ))}
@@ -101,9 +101,9 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
       </button>
 
       {showHint && (
-        <div className="bg-warning/10 border border-warning/20 rounded-xl p-4 mb-4 text-sm text-warning animate-fade-in">
-          <div className="flex items-start gap-2">
-            <Lightbulb className="h-4 w-4 mt-0.5 shrink-0" />
+        <div className="bg-warning/10 border border-warning/20 rounded-xl p-5 mb-4 text-base font-medium text-warning animate-fade-in leading-relaxed">
+          <div className="flex items-start gap-3">
+            <Lightbulb className="h-5 w-5 mt-0.5 shrink-0" />
             <p>{question.hint}</p>
           </div>
         </div>
