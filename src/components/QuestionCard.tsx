@@ -84,7 +84,7 @@ const QuestionCard = ({ question, index, attempt, onSubmit }: QuestionCardProps)
       </div>
 
       {/* Description */}
-      <div className="bg-muted/50 rounded-xl p-4 mb-4 font-mono text-sm">
+      <div className="bg-muted/50 rounded-xl p-4 mb-4 font-mono text-sm font-medium">
         {question.description.split('\n').map((line, i) => (
           <p key={i} className="text-foreground">{line}</p>
         ))}
