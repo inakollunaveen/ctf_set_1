@@ -46,8 +46,8 @@ export const QUESTIONS: Question[] = [
   {
     id: "r3",
     title: "Split & Decode",
-    description: "Decode this split message: 'KLOCC||||IDTHNGMI'",
-    hint: "The message is split in two parts. Combine alternating characters from each part.",
+    description: "Decode this split message: 'KLOCC||||IDTHNGMI'\n\nExample: TAC||||DOG\nProcess: Split at |||| → TAC | DOG, then rearrange letters: TAC → CAT, DOG → DOG\nResult: CAT DOG",
+    hint: "Split the message, then rearrange each part to form a word.",
     answer: "CLOCK MIDNIGHT",
     points: 10,
   },
