@@ -30,7 +30,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "r1",
     title: "ROT13 Cipher Challenge",
-    description: "Decode the following ROT13 encoded message: 'frperg_zrffntr'",
+    description: "Decode the following ROT13 encoded message: 'frperg_zrffntr'\n\nExample: uryyb\nProcess: Shift each letter -13 steps: u→h, r→e, y→l, y→l, b→o\nResult: hello",
     hint: "ROT13 rotates each letter by 13 positions. A becomes N, B becomes O, etc.",
     answer: "SECRET_MESSAGE",
     points: 10,
@@ -38,7 +38,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "r2",
     title: "Caesar Cipher Breaker",
-    description: "Decrypt this Caesar cipher: 'xqorfn_vwdjh'",
+    description: "Decrypt this Caesar cipher: 'xqorfn_vwdjh'\n\nExample: khoor\nProcess: Shift each letter -3 steps backward: k→h, h→e, o→l, o→l, r→o\nResult: hello",
     hint: "Caesar cipher shifts letters by a fixed number. Try different shift values (this one uses shift of 3).",
     answer: "UNLOCK_STAGE",
     points: 10,
