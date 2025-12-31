@@ -105,11 +105,26 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
       </div>
 
       {/* Description */}
-      <div className="bg-muted/50 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
-        {question.description.split('\n').map((line, i) => (
-          <p key={i} className="text-foreground">{line}</p>
-        ))}
-      </div>
+      {(() => {
+        const parts = question.description.split('\n\n');
+        const mainDescription = parts[0];
+        const exampleSection = parts.slice(1).join('\n\n');
+        
+        return (
+          <>
+            <div className="bg-muted/50 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
+              <p className="text-foreground">{mainDescription}</p>
+            </div>
+            {exampleSection && (
+              <div className="bg-orange-500/15 border border-orange-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
+                {exampleSection.split('\n').map((line, i) => (
+                  <p key={i} className="text-orange-600 dark:text-orange-400">{line}</p>
+                ))}
+              </div>
+            )}
+          </>
+        );
+      })()}
 
       {/* Hint Toggle */}
       <button
