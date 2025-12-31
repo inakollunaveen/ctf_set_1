@@ -116,9 +116,9 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
               <p className="text-foreground">{mainDescription}</p>
             </div>
             {exampleSection && (
-              <div className="bg-orange-500/15 border border-orange-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
+              <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
                 {exampleSection.split('\n').map((line, i) => (
-                  <p key={i} className="text-orange-600 dark:text-orange-400">{line}</p>
+                  <p key={i} className="text-blue-600 dark:text-blue-400">{line}</p>
                 ))}
               </div>
             )}
