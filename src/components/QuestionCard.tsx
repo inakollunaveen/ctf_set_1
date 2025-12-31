@@ -7,16 +7,25 @@ import { Question } from "@/lib/ctfData";
 interface QuestionCardProps {
   question: Question;
   index: number;
-  attempt?: { answer: string; correct: boolean };
-  onSubmit: (questionId: string, answer: string) => void;
+  attempt?: { answer: string; correct: boolean; hintUsed?: boolean };
+  onSubmit: (questionId: string, answer: string, hintUsed: boolean) => void;
   isLocked?: boolean;
   isChoice?: boolean;
+  onHintUsed?: (questionId: string) => void;
+  hintUsed?: boolean;
 }
 
-const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, isChoice = false }: QuestionCardProps) => {
+const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, isChoice = false, onHintUsed, hintUsed = false }: QuestionCardProps) => {
   const [answer, setAnswer] = useState(attempt?.answer || "");
   const [showHint, setShowHint] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleToggleHint = () => {
+    if (!showHint && !hintUsed && onHintUsed) {
+      onHintUsed(question.id);
+    }
+    setShowHint(!showHint);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +33,7 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
     
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 300));
-    onSubmit(question.id, answer.trim());
+    onSubmit(question.id, answer.trim(), hintUsed);
     setIsSubmitting(false);
   };
 
@@ -104,11 +113,11 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
 
       {/* Hint Toggle */}
       <button
-        onClick={() => setShowHint(!showHint)}
+        onClick={handleToggleHint}
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
       >
         <Lightbulb className="h-4 w-4" />
-        <span>{showHint ? "Hide Hint" : "Show Hint"}</span>
+        <span>{showHint ? "Hide Hint" : "Show Hint"} {hintUsed && "(−5 pts)"}</span>
         {showHint ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </button>
 

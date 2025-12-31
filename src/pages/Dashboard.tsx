@@ -39,21 +39,35 @@ const Dashboard = () => {
     setPlayer(currentPlayer);
   }, [navigate]);
 
-  const calculateScore = useCallback((attempts: Player["attempts"]) => {
-    const scores = Object.values(attempts)
-      .filter((a) => a.correct)
-      .map(() => 10);
+  const calculateScore = useCallback((attempts: Player["attempts"], hintUsage: Record<string, boolean>) => {
+    const scores = Object.entries(attempts)
+      .filter(([_, a]) => a.correct)
+      .map(([id, _]) => hintUsage[id] ? 5 : 10); // -5 if hint was used
     return scores.sort((a, b) => b - a).slice(0, 3).reduce((sum, s) => sum + s, 0);
   }, []);
 
+  const [hintUsage, setHintUsage] = useState<Record<string, boolean>>(() => {
+    const stored = localStorage.getItem("ctf_hint_usage");
+    return stored ? JSON.parse(stored) : {};
+  });
+
+  const handleHintUsed = useCallback((questionId: string) => {
+    setHintUsage(prev => {
+      const updated = { ...prev, [questionId]: true };
+      localStorage.setItem("ctf_hint_usage", JSON.stringify(updated));
+      return updated;
+    });
+  }, []);
+
   const handleSubmit = useCallback(
-    (questionId: string, answer: string) => {
+    (questionId: string, answer: string, hintUsed: boolean) => {
       if (!player) return;
 
       const question = QUESTIONS.find((q) => q.id === questionId);
       if (!question) return;
 
       const isCorrect = answer.toUpperCase() === question.answer;
+      const pointsEarned = hintUsed ? 5 : 10;
 
       const updatedPlayer = {
         ...player,
@@ -63,18 +77,19 @@ const Dashboard = () => {
             answer,
             correct: isCorrect,
             timestamp: Date.now(),
+            hintUsed,
           },
         },
       };
 
-      updatedPlayer.score = calculateScore(updatedPlayer.attempts);
+      updatedPlayer.score = calculateScore(updatedPlayer.attempts, hintUsage);
       setPlayer(updatedPlayer);
       saveCurrentPlayer(updatedPlayer);
 
       if (isCorrect) {
         toast({
           title: "✓ Correct Answer!",
-          description: `+${question.points} points earned.`,
+          description: `+${pointsEarned} points earned${hintUsed ? " (hint used: -5)" : ""}.`,
         });
       } else {
         toast({
@@ -84,7 +99,7 @@ const Dashboard = () => {
         });
       }
     },
-    [player, calculateScore]
+    [player, calculateScore, hintUsage]
   );
 
   const handleFinish = useCallback(() => {
@@ -254,6 +269,8 @@ const Dashboard = () => {
                 onSubmit={handleSubmit}
                 isLocked={isLocked}
                 isChoice={isChoice}
+                onHintUsed={handleHintUsed}
+                hintUsed={hintUsage[question.id] || false}
               />
             );
           })}
