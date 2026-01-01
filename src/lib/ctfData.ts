@@ -43,14 +43,6 @@ export const QUESTIONS: Question[] = [
     answer: "UNLOCK_STAGE",
     points: 10,
   },
-  {
-    id: "r3",
-    title: "Header Challenge",
-    description: "Send a request to /hidden with a special header to extract the flag.\n\n📌 Example using curl:\ncurl -H \"X-Shadow-Token: open_sesame\" http://localhost:7016/hidden?pc_no=PC01\n\n📌 Server Response:\nflag{shadowbreak_mission_PC01_9f2a1c8b0e2d}\n\n📌 Extract & Submit:\nOnly submit the last part: 9f2a1c8b0e2d\n\n⚠️ Replace PC01 with your actual PC number!",
-    hint: "Use curl or Postman to send the request. The header X-Shadow-Token must be exactly 'open_sesame'. Extract only the hash part after the last underscore.",
-    answer: "9f2a1c8b0e2d",
-    points: 10,
-  },
 ];
 
 export const TOTAL_TIME_SECONDS = 25 * 60; // 25 minutes
