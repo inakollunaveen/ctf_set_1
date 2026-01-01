@@ -43,6 +43,14 @@ export const QUESTIONS: Question[] = [
     answer: "UNLOCK_STAGE",
     points: 10,
   },
+  {
+    id: "r3",
+    title: "Header Challenge",
+    description: "🔐 Send a request to the /hidden endpoint with a special header to extract your unique flag.\n\n📌 Using curl:\ncurl -H \"X-Shadow-Token: open_sesame\" \"https://ieqwvswosxglbggtmbfb.supabase.co/functions/v1/hidden?pc_no=YOUR_PC_NO\"\n\n📌 Using Postman:\n1. Create a GET request to the URL above\n2. Add header: X-Shadow-Token: open_sesame\n3. Replace YOUR_PC_NO with your actual PC number\n\n📌 Server Response:\nflag{shadowbreak_mission_PC01_a1b2c3d4e5f6}\n\n📌 Extract & Submit:\nOnly submit the 12-character hash after the last underscore (e.g., a1b2c3d4e5f6)\n\n⚠️ Each PC number generates a UNIQUE flag identifier!",
+    hint: "Use curl or Postman to send the GET request. The header X-Shadow-Token must be exactly 'open_sesame'. Extract only the 12-character hash part after the last underscore.",
+    answer: "DYNAMIC",
+    points: 10,
+  },
 ];
 
 export const TOTAL_TIME_SECONDS = 25 * 60; // 25 minutes

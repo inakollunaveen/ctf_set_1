@@ -1,0 +1,7 @@
+project_id = "ieqwvswosxglbggtmbfb"
+
+[functions.hidden]
+verify_jwt = false
+
+[functions.validate-flag]
+verify_jwt = false

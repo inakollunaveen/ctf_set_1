@@ -14,6 +14,7 @@ import {
   Player,
 } from "@/lib/ctfData";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,14 +61,49 @@ const Dashboard = () => {
   }, []);
 
   const handleSubmit = useCallback(
-    (questionId: string, answer: string, hintUsed: boolean) => {
+    async (questionId: string, answer: string, hintUsed: boolean) => {
       if (!player) return;
 
       const question = QUESTIONS.find((q) => q.id === questionId);
       if (!question) return;
 
-      const isCorrect = answer.toUpperCase() === question.answer;
+      let isCorrect = false;
       const pointsEarned = hintUsed ? 5 : 10;
+
+      // For Round 3 (Header Challenge), validate dynamically via edge function
+      if (questionId === "r3") {
+        try {
+          const { data, error } = await supabase.functions.invoke('validate-flag', {
+            body: { 
+              pc_no: player.pcNo, 
+              submitted_identifier: answer.trim() 
+            }
+          });
+
+          if (error) {
+            console.error('Validation error:', error);
+            toast({
+              title: "Validation Error",
+              description: "Could not validate your answer. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          isCorrect = data?.valid === true;
+        } catch (err) {
+          console.error('Network error:', err);
+          toast({
+            title: "Network Error",
+            description: "Could not connect to validation server.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        // Static validation for other rounds
+        isCorrect = answer.toUpperCase() === question.answer;
+      }
 
       const updatedPlayer = {
         ...player,
@@ -225,13 +261,13 @@ const Dashboard = () => {
                 Mission Progress
               </h2>
               <p className="text-muted-foreground">
-                Attempt any 3 out of 4 questions. Best 3 scores count.
+                Attempt any 3 out of 3 questions. Best 3 scores count.
               </p>
             </div>
 
             <div className="flex items-center gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">{attemptCount}/4</p>
+                <p className="text-2xl font-bold text-foreground">{attemptCount}/3</p>
                 <p className="text-sm text-muted-foreground">Attempted</p>
               </div>
               <div className="text-center">
@@ -246,7 +282,7 @@ const Dashboard = () => {
         <div className="flex flex-col gap-6 max-w-3xl mx-auto">
           {/* Info about choice rounds */}
           <div className="text-center text-muted-foreground text-sm mb-2">
-            Complete Round 1 → Unlock Round 2 → Unlock Rounds 3 & 4 (Choose any one)
+            Complete Round 1 → Unlock Round 2 → Unlock Round 3 (Header Challenge)
           </div>
           
           {QUESTIONS.map((question, index) => {
