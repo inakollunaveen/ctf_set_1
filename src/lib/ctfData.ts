@@ -51,14 +51,6 @@ export const QUESTIONS: Question[] = [
     answer: "9f2a1c8b0e2d",
     points: 10,
   },
-  {
-    id: "r4",
-    title: "Binary Translation",
-    description: "Convert this binary to text: '01001000 01000001 01000011 01001011'\n\nExample: 01001000 01001001\nProcess: 01001000 → 72 → H, 01001001 → 73 → I\nResult: HI",
-    hint: "Each 8-bit group represents one ASCII character. Convert binary to decimal, then to character.",
-    answer: "HACK",
-    points: 10,
-  },
 ];
 
 export const TOTAL_TIME_SECONDS = 25 * 60; // 25 minutes
