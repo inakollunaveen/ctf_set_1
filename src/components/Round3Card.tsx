@@ -11,17 +11,24 @@ interface Round3CardProps {
   teamId: string;
   isLocked: boolean;
   attempt?: { answer: string; correct: boolean; timestamp: number; hintUsed?: boolean };
-  onComplete: (identifier: string, correct: boolean) => void;
+  onComplete: (identifier: string, correct: boolean, hintUsed?: boolean) => void;
   onHintUsed?: () => void;
   hintUsed?: boolean;
 }
 
-const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUsed = false }: Round3CardProps) => {
+const Round3Card = ({
+  teamId,
+  isLocked,
+  attempt,
+  onComplete,
+  onHintUsed,
+  hintUsed = false,
+}: Round3CardProps) => {
   const [identifier, setIdentifier] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  const header = typeof window !== 'undefined' ? window.location.origin : '';
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   const handleSubmit = async () => {
     if (!identifier.trim()) {
@@ -34,17 +41,11 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
     }
 
     setIsSubmitting(true);
-
     try {
-      const response = await fetch('/api/validate-round3', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          teamId,
-          identifier: identifier.trim(),
-        }),
+      const response = await fetch("/api/validate-round3", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ teamId, identifier: identifier.trim() }),
       });
 
       const data = await response.json();
@@ -52,7 +53,7 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
       if (data.success) {
         toast({
           title: "Round 3 Completed!",
-          description: `+${hintUsed ? 5 : 10} points earned${hintUsed ? " (hint used: -5)" : ""}.`,
+          description: `+${hintUsed ? 5 : 10} points${hintUsed ? " (hint used: -5)" : ""}.`,
         });
         onComplete(identifier, true, hintUsed);
       } else {
@@ -63,10 +64,10 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
         });
         onComplete(identifier, false, hintUsed);
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
-        description: "Failed to validate. Please check if the backend is running.",
+        description: "Validation failed. Ensure the backend is running.",
         variant: "destructive",
       });
     } finally {
@@ -79,12 +80,9 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
       <Card className="ctf-card border-muted">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Round 3: Header Challenge
+            <Lock className="h-5 w-5" /> Round 3: Header Challenge
           </CardTitle>
-          <CardDescription>
-            Complete Round 2 to unlock this challenge.
-          </CardDescription>
+          <CardDescription>Complete Round 2 to unlock this challenge.</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -93,7 +91,7 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
   const isCompleted = attempt?.correct;
 
   return (
-    <Card className={`ctf-card ${isCompleted ? 'border-green-500' : ''}`}>
+    <Card className={`ctf-card ${isCompleted ? "border-green-500" : ""}`}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           {isCompleted ? (
@@ -108,19 +106,27 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
           Use HTTP headers to access a hidden endpoint and extract the unique identifier.
         </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-4">
-        <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
-          <h4 className="font-semibold mb-2">Instructions:</h4>
+        {/* Instructions */}
+        <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 font-mono">
+          <h4 className="font-semibold mb-2">Instructions</h4>
           <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
-            <li>Open the link <code className="bg-background px-1 py-0.5 rounded">/api/hidden?team_id={teamId}</code> in your browser and locate the token shown as X-Shadow-Token.</li>
-            <li>Copy the token value exactly as displayed.</li>
-            <li>Send a GET request using curl by placing the token into the header:</li>
+           <li>
+  Open the next path in your browser header. Remove <code>/dashboard</code> from the URL and use the following instead:{" "}
+  <code className="bg-background px-1 py-0.5 rounded">/api/hidden?team_id={teamId}</code>
+</li>
+            <li>The page reveals the required header name (not the flag).</li>
+            <li>
+              Send a GET request using that header name with value{" "}
+              <code>open_sesame</code>.
+            </li>
           </ol>
-          <pre className="bg-background p-2 rounded text-sm overflow-x-auto mt-2">
-            curl -H "X-Shadow-Token: open_sesame" "{header}/api/hidden?team_id={teamId}"
+          <pre className="bg-background p-2 rounded text-sm overflow-x-auto mt-3">
+            {`curl -H "<next-path-header-name>: open_sesame" "${origin}/api/hidden?team_id=${teamId}"`}
           </pre>
           <p className="text-sm text-muted-foreground mt-2">
-            4. The response will contain a flag—extract and submit only the flag ID portion.
+            Extract and submit only the flag identifier from the response.
           </p>
         </div>
 
@@ -130,8 +136,8 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Lightbulb className="h-4 w-4 text-yellow-600" />
-                <span className="font-medium text-yellow-800 dark:text-yellow-200">Hint</span>
-                {hintUsed && <Badge variant="outline" className="text-yellow-600">Used (-5 points)</Badge>}
+                <span className="font-medium">Hint</span>
+                {hintUsed && <Badge variant="outline">Used (-5 points)</Badge>}
               </div>
               {!showHint && !hintUsed && (
                 <Button
@@ -147,31 +153,18 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
               )}
             </div>
             {showHint && (
-              <div className="text-sm text-yellow-700 dark:text-yellow-300 space-y-2">
-                <div>
-                  <strong>Hint:</strong>
-                </div>
-                <pre className="bg-yellow-100 dark:bg-yellow-800 p-2 rounded text-xs overflow-x-auto">
-                  curl -H "X-Shadow-Token: open_sesame" "https://your-deployment-url.vercel.app/api/hidden?team_id=your_pc_number"
-                </pre>
-                <div className="text-black font-semibold">
-                  paste in cmd prompt
-                </div>
-                <div>
-                  <strong>Example:</strong><br />
-                  If the response is <code>flag&#123;shadowbreak_mission_1_d04acb46f025&#125;</code><br />
-                  Submit only the flag ID: <code>d04acb46f02</code>
-                </div>
-              </div>
+              <pre className="bg-yellow-100 dark:bg-yellow-800 p-2 rounded text-xs overflow-x-auto">
+                {`curl -H "X-Shadow-Token: open_sesame" "${origin}/api/hidden?team_id=${teamId}"`}
+              </pre>
             )}
           </div>
         )}
 
+        {/* Identifier Input */}
         <div className="space-y-2">
           <Label htmlFor="identifier">Unique Identifier</Label>
           <Input
             id="identifier"
-            placeholder="Enter the 12-character identifier"
             value={isCompleted ? attempt?.answer || "" : identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             maxLength={12}
@@ -182,16 +175,23 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
             disabled={isSubmitting || isCompleted}
             className="w-full"
           >
-            {isSubmitting ? "Validating..." : isCompleted ? "Completed" : "Submit Identifier"}
+            {isSubmitting
+              ? "Validating..."
+              : isCompleted
+              ? "Completed"
+              : "Submit Identifier"}
           </Button>
         </div>
 
+        {/* Attempt Feedback */}
         {attempt && (
           <div className="flex items-center gap-2 text-sm">
             {attempt.correct ? (
               <>
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-green-600">Correct: +{attempt.hintUsed ? 5 : 10} points{attempt.hintUsed ? " (hint used: -5)" : ""}</span>
+                <span className="text-green-600">
+                  Correct (+{attempt.hintUsed ? 5 : 10} points)
+                </span>
               </>
             ) : (
               <>

@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5009;
 
 // Enable CORS for development (optional in production if same origin)
 app.use(cors());
@@ -39,7 +39,7 @@ app.get('/api/hidden', (req, res) => {
   }
 
   if (shadowToken !== 'open_sesame') {
-    return res.status(403).json({ error: 'Forbidden: Invalid or missing X-Shadow-Token header' });
+    return res.status(403).json({ error: 'next-path-header-name:X-Shadow-Token' });
   }
 
   // Generate deterministic HMAC-SHA256 digest for the team_id
