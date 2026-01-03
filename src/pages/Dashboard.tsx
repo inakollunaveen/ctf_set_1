@@ -15,6 +15,7 @@ import {
   Player,
 } from "@/lib/ctfData";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,10 +69,45 @@ const Dashboard = () => {
       if (!question) return;
 
       let isCorrect = false;
-      let pointsEarned = hintUsed ? 5 : 10;
+      const pointsEarned = hintUsed ? 5 : 10;
 
       // Normal validation for all rounds
       isCorrect = answer.toUpperCase() === question.answer;
+
+      // For Round 3 (Header Challenge), validate dynamically via edge function
+      if (questionId === "r3") {
+        try {
+          const { data, error } = await supabase.functions.invoke('validate-flag', {
+            body: { 
+              pc_no: player.pcNo, 
+              submitted_identifier: answer.trim() 
+            }
+          });
+
+          if (error) {
+            console.error('Validation error:', error);
+            toast({
+              title: "Validation Error",
+              description: "Could not validate your answer. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          isCorrect = data?.valid === true;
+        } catch (err) {
+          console.error('Network error:', err);
+          toast({
+            title: "Network Error",
+            description: "Could not connect to validation server.",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        // Static validation for other rounds
+        isCorrect = answer.toUpperCase() === question.answer;
+      }
 
       const updatedPlayer = {
         ...player,
