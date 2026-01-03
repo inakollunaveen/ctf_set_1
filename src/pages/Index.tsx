@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, User, Hash, Monitor, Rocket, Trophy, Phone } from "lucide-react";
+import { Shield, User, Hash, Monitor, Rocket, Trophy, Phone, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { saveCurrentPlayer } from "@/lib/ctfData";
 import { toast } from "@/hooks/use-toast";
 
@@ -146,8 +147,8 @@ const Index = () => {
             </Button>
           </form>
 
-          {/* Leaderboard Link */}
-          <div className="mt-6 pt-6 border-t border-border">
+          {/* Links */}
+          <div className="mt-6 pt-6 border-t border-border space-y-3">
             <Button
               variant="outline"
               className="w-full"
@@ -155,6 +156,14 @@ const Index = () => {
             >
               <Trophy className="h-5 w-5" />
               View Leaderboard
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => navigate("/leaderboard")}
+            >
+              <LogIn className="h-5 w-5" />
+              Admin Login
             </Button>
           </div>
         </div>
