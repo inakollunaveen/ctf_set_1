@@ -10,6 +10,7 @@ import {
   User,
   Hash,
   Monitor,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -115,7 +116,7 @@ const Leaderboard = () => {
             <div className="bg-muted/50 px-6 py-4 border-b border-border">
               <div className="grid grid-cols-12 gap-4 text-sm font-medium text-muted-foreground">
                 <div className="col-span-1 text-center">#</div>
-                <div className="col-span-3 flex items-center gap-2">
+                <div className="col-span-2 flex items-center gap-2">
                   <User className="h-4 w-4" />
                   Name
                 </div>
@@ -128,10 +129,14 @@ const Leaderboard = () => {
                   PC No
                 </div>
                 <div className="col-span-2 flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Phone No
+                </div>
+                <div className="col-span-2 flex items-center gap-2">
                   <Trophy className="h-4 w-4" />
                   Score
                 </div>
-                <div className="col-span-2 flex items-center gap-2">
+                <div className="col-span-1 flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Time
                 </div>
@@ -152,7 +157,7 @@ const Leaderboard = () => {
                       <div className="col-span-1 flex justify-center">
                         {getRankIcon(rank)}
                       </div>
-                      <div className="col-span-3">
+                      <div className="col-span-2">
                         <span className="font-semibold text-foreground">
                           {entry.name}
                         </span>
@@ -168,6 +173,11 @@ const Leaderboard = () => {
                         </span>
                       </div>
                       <div className="col-span-2">
+                        <span className="text-muted-foreground font-mono text-sm">
+                          {entry.phoneNo}
+                        </span>
+                      </div>
+                      <div className="col-span-2">
                         <span
                           className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold ${
                             entry.score === 30
@@ -180,7 +190,7 @@ const Leaderboard = () => {
                           {entry.score}/30
                         </span>
                       </div>
-                      <div className="col-span-2">
+                      <div className="col-span-1">
                         <span className="text-muted-foreground font-mono text-sm">
                           {entry.time.toFixed(1)}s
                         </span>

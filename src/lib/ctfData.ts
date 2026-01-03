@@ -11,16 +11,18 @@ export interface Player {
   name: string;
   rollNo: string;
   pcNo: string;
+  phoneNo: string;
   score: number;
   startTime: number;
   endTime?: number;
-  attempts: Record<string, { answer: string; correct: boolean; timestamp: number }>;
+  attempts: Record<string, { answer: string; correct: boolean; timestamp: number; hintUsed?: boolean }>;
 }
 
 export interface LeaderboardEntry {
   name: string;
   rollNo: string;
   pcNo: string;
+  phoneNo: string;
   score: number;
   time: number;
   completedAt: string;
@@ -30,35 +32,19 @@ export const QUESTIONS: Question[] = [
   {
     id: "r1",
     title: "ROT13 Cipher Challenge",
-    description: "Decode the following ROT13 encoded message: 'frperg_zrffntr'\n\nExample: jbeyq\nProcess: Shift each letter -13 steps: j→w, b→o, e→r, y→l, q→d\nResult: world",
-    hint: "ROT13 rotates each letter by 13 positions. A becomes N, B becomes O, etc.",
+    description: "Decode the following ROT13 encoded message: 'frperg_zrffntr'\n\nExample: jbeyq\nProcess: Shift each letter -13 steps\nResult: world",
+    hint: "above example j→w, b→o, e→r, y→l, q→d ,jbeyq->world",
     answer: "SECRET_MESSAGE",
     points: 10,
   },
   {
     id: "r2",
     title: "Caesar Cipher Breaker",
-    description: "Decrypt this Caesar cipher: 'xqorfn_vwdjh'\n\nExample: frgh\nProcess: Shift each letter -3 steps backward: f→c, r→o, g→d, h→e\nResult: code",
-    hint: "Caesar cipher shifts letters by a fixed number. Try different shift values (this one uses shift of 3).",
+    description: "Decrypt this Caesar cipher: 'xqorfn_vwdjh'\n\nExample: frgh\nProcess: Shift each letter -3 steps backward\nResult: code",
+    hint: "above example f→c, r→o, g→d, h→e frgh->code",
     answer: "UNLOCK_STAGE",
     points: 10,
-  },
-  {
-    id: "r3",
-    title: "Split & Decode",
-    description: "Decode this split message: 'KLOCC||||IDTHNGMI'\n\nExample: TAC||||DOG\nProcess: Split at |||| → TAC | DOG, then rearrange letters: TAC → CAT, DOG → DOG\nResult: CAT DOG",
-    hint: "Split the message, then rearrange each part to form a word.",
-    answer: "CLOCK MIDNIGHT",
-    points: 10,
-  },
-  {
-    id: "r4",
-    title: "Binary Translation",
-    description: "Convert this binary to text: '01001000 01000001 01000011 01001011'\n\nExample: 01001000 01001001\nProcess: 01001000 → 72 → H, 01001001 → 73 → I\nResult: HI",
-    hint: "Each 8-bit group represents one ASCII character. Convert binary to decimal, then to character.",
-    answer: "HACK",
-    points: 10,
-  },
+  }
 ];
 
 export const TOTAL_TIME_SECONDS = 25 * 60; // 25 minutes
@@ -92,7 +78,7 @@ export const clearCurrentPlayer = (): void => {
 };
 
 export const exportToExcel = (data: LeaderboardEntry[]): void => {
-  const headers = ["Rank", "Name", "Roll No", "PC No", "Score", "Time (seconds)", "Completed At"];
+  const headers = ["Rank", "Name", "Roll No", "PC No", "Phone No", "Score", "Time (seconds)", "Completed At"];
   const sortedData = [...data].sort((a, b) => b.score - a.score || a.time - b.time);
   
   const csvContent = [
@@ -102,6 +88,7 @@ export const exportToExcel = (data: LeaderboardEntry[]): void => {
       `"${entry.name}"`,
       `"${entry.rollNo}"`,
       `"${entry.pcNo}"`,
+      `"${entry.phoneNo}"`,
       entry.score,
       entry.time.toFixed(2),
       `"${entry.completedAt}"`,

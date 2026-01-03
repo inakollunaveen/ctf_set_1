@@ -4,6 +4,7 @@ import { Shield, Trophy, Flag, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Timer from "@/components/Timer";
 import QuestionCard from "@/components/QuestionCard";
+import Round3Card from "@/components/Round3Card";
 import {
   QUESTIONS,
   TOTAL_TIME_SECONDS,
@@ -60,14 +61,17 @@ const Dashboard = () => {
   }, []);
 
   const handleSubmit = useCallback(
-    (questionId: string, answer: string, hintUsed: boolean) => {
+    async (questionId: string, answer: string, hintUsed: boolean) => {
       if (!player) return;
 
       const question = QUESTIONS.find((q) => q.id === questionId);
       if (!question) return;
 
-      const isCorrect = answer.toUpperCase() === question.answer;
-      const pointsEarned = hintUsed ? 5 : 10;
+      let isCorrect = false;
+      let pointsEarned = hintUsed ? 5 : 10;
+
+      // Normal validation for all rounds
+      isCorrect = answer.toUpperCase() === question.answer;
 
       const updatedPlayer = {
         ...player,
@@ -102,18 +106,47 @@ const Dashboard = () => {
     [player, calculateScore, hintUsage]
   );
 
+  const handleRound3Submit = useCallback(
+    (identifier: string, correct: boolean, hintUsed: boolean) => {
+      if (!player) return;
+
+      const pointsEarned = correct ? (hintUsed ? 5 : 10) : 0;
+
+      const updatedPlayer = {
+        ...player,
+        attempts: {
+          ...player.attempts,
+          r3: {
+            answer: identifier,
+            correct,
+            timestamp: Date.now(),
+            hintUsed,
+          },
+        },
+      };
+
+      updatedPlayer.score = calculateScore(updatedPlayer.attempts, hintUsage);
+      setPlayer(updatedPlayer);
+      saveCurrentPlayer(updatedPlayer);
+
+      if (correct) {
+        toast({
+          title: "✓ Round 3 Completed!",
+          description: `+${pointsEarned} points earned${hintUsed ? " (hint used: -5)" : ""}.`,
+        });
+      } else {
+        toast({
+          title: "✗ Incorrect",
+          description: "Try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [player, calculateScore, hintUsage]
+  );
+
   const handleFinish = useCallback(() => {
     if (!player) return;
-
-    const attemptCount = Object.keys(player.attempts).length;
-    if (attemptCount < 3) {
-      toast({
-        title: "Not Enough Attempts",
-        description: `You need to attempt at least 3 questions. Currently: ${attemptCount}/3`,
-        variant: "destructive",
-      });
-      return;
-    }
 
     setShowFinishDialog(true);
   }, [player]);
@@ -128,6 +161,7 @@ const Dashboard = () => {
       name: player.name,
       rollNo: player.rollNo,
       pcNo: player.pcNo,
+      phoneNo: player.phoneNo,
       score: player.score,
       time: timeElapsed,
       completedAt: new Date().toISOString(),
@@ -160,6 +194,7 @@ const Dashboard = () => {
       name: player.name,
       rollNo: player.rollNo,
       pcNo: player.pcNo,
+      phoneNo: player.phoneNo,
       score: player.score,
       time: timeElapsed,
       completedAt: new Date().toISOString(),
@@ -174,6 +209,9 @@ const Dashboard = () => {
 
   const attemptCount = Object.keys(player.attempts).length;
   const correctCount = Object.values(player.attempts).filter((a) => a.correct).length;
+
+  const r1Correct = player.attempts["r1"]?.correct;
+  const r2Correct = player.attempts["r2"]?.correct;
 
   return (
     <div className="min-h-screen bg-background">
@@ -225,13 +263,13 @@ const Dashboard = () => {
                 Mission Progress
               </h2>
               <p className="text-muted-foreground">
-                Attempt any 3 out of 4 questions. Best 3 scores count.
+                Complete Round 1 → Unlock Round 2 → Unlock Round 3.
               </p>
             </div>
 
             <div className="flex items-center gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">{attemptCount}/4</p>
+                <p className="text-2xl font-bold text-foreground">{attemptCount}/3</p>
                 <p className="text-sm text-muted-foreground">Attempted</p>
               </div>
               <div className="text-center">
@@ -246,19 +284,16 @@ const Dashboard = () => {
         <div className="flex flex-col gap-6 max-w-3xl mx-auto">
           {/* Info about choice rounds */}
           <div className="text-center text-muted-foreground text-sm mb-2">
-            Complete Round 1 → Unlock Round 2 → Unlock Rounds 3 & 4 (Choose any one)
+            Complete Round 1 → Unlock Round 2 → Unlock Round 3.
           </div>
           
           {QUESTIONS.map((question, index) => {
-            // Unlock logic: R1 always open, R2 after R1 correct, R3 & R4 after R2 correct
-            const r1Correct = player.attempts["r1"]?.correct;
-            const r2Correct = player.attempts["r2"]?.correct;
+            // Unlock logic: R1 always open, R2 after R1 correct
             
             let isLocked = false;
             if (index === 1) isLocked = !r1Correct; // Round 2
-            if (index === 2 || index === 3) isLocked = !r2Correct; // Round 3 & 4
             
-            const isChoice = index === 2 || index === 3; // Round 3 & 4 are choice
+            const isChoice = false; // No choice rounds
             
             return (
               <QuestionCard
@@ -276,26 +311,30 @@ const Dashboard = () => {
           })}
         </div>
 
+        {/* Round 3 */}
+        <div className="flex flex-col gap-6 max-w-3xl mx-auto">
+          <Round3Card
+            teamId={player.pcNo}
+            isLocked={!r2Correct}
+            attempt={player.attempts.r3}
+            onComplete={handleRound3Submit}
+            onHintUsed={() => handleHintUsed('r3')}
+            hintUsed={hintUsage.r3 || false}
+          />
+        </div>
+
         {/* Finish Button */}
         <div className="mt-8 flex justify-center">
           <Button
             onClick={handleFinish}
             variant="hero"
             size="xl"
-            disabled={attemptCount < 3}
             className="gap-3"
           >
             <Flag className="h-6 w-6" />
             Finish Mission
           </Button>
         </div>
-
-        {attemptCount < 3 && (
-          <p className="text-center text-muted-foreground mt-4 flex items-center justify-center gap-2">
-            <AlertCircle className="h-4 w-4" />
-            Attempt at least 3 questions to finish
-          </p>
-        )}
       </main>
 
       {/* Finish Confirmation Dialog */}

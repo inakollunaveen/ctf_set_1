@@ -99,7 +99,7 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
                 : "bg-destructive/20 text-destructive"
             }`}
           >
-            {isCorrect ? "✓ Correct" : "✗ Attempted"}
+            {isCorrect ? `✓ Correct: +${attempt?.hintUsed ? 5 : 10} points${attempt?.hintUsed ? " (hint used: -5)" : ""}` : "✗ Incorrect attempt"}
           </div>
         )}
       </div>
@@ -116,9 +116,9 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
               <p className="text-foreground">{mainDescription}</p>
             </div>
             {exampleSection && (
-              <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
+              <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 mb-4 font-mono text-sm font-medium leading-relaxed">
                 {exampleSection.split('\n').map((line, i) => (
-                  <p key={i} className="text-blue-600 dark:text-blue-400">{line}</p>
+                  <p key={i} className="text-muted-foreground">{line}</p>
                 ))}
               </div>
             )}
@@ -158,19 +158,21 @@ const QuestionCard = ({ question, index, attempt, onSubmit, isLocked = false, is
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="Enter your answer..."
             className="flex-1 bg-background border-border focus:ring-primary"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isCorrect}
           />
           <Button
             type="submit"
-            disabled={!answer.trim() || isSubmitting}
+            disabled={!answer.trim() || isSubmitting || isCorrect}
             className="gap-2"
           >
             {isSubmitting ? (
               <div className="h-4 w-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+            ) : isCorrect ? (
+              "Completed"
             ) : (
               <Send className="h-4 w-4" />
             )}
-            Submit
+            {isCorrect ? "" : "Submit"}
           </Button>
         </form>
       )}

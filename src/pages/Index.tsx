@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Shield, User, Hash, Monitor, Rocket, Trophy } from "lucide-react";
+import { Shield, User, Hash, Monitor, Rocket, Trophy, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveCurrentPlayer } from "@/lib/ctfData";
@@ -11,12 +11,13 @@ const Index = () => {
   const [name, setName] = useState("");
   const [rollNo, setRollNo] = useState("");
   const [pcNo, setPcNo] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name.trim() || !rollNo.trim() || !pcNo.trim()) {
+    if (!name.trim() || !rollNo.trim() || !pcNo.trim() || !phoneNo.trim()) {
       toast({
         title: "Missing Information",
         description: "Please fill in all fields to continue.",
@@ -32,12 +33,16 @@ const Index = () => {
       name: name.trim(),
       rollNo: rollNo.trim(),
       pcNo: pcNo.trim(),
+      phoneNo: phoneNo.trim(),
       score: 0,
       startTime: Date.now(),
       attempts: {},
     };
 
     saveCurrentPlayer(player);
+    
+    // Clear hint usage for new player
+    localStorage.removeItem("ctf_hint_usage");
     
     toast({
       title: "Mission Started!",
@@ -111,6 +116,19 @@ const Index = () => {
               />
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                <Phone className="h-4 w-4 inline mr-2" />
+                Phone Number
+              </label>
+              <Input
+                value={phoneNo}
+                onChange={(e) => setPhoneNo(e.target.value)}
+                placeholder="Enter your phone number"
+                disabled={isLoading}
+              />
+            </div>
+
             <Button
               type="submit"
               variant="hero"
@@ -141,10 +159,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Footer Info */}
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          Attempt any 3 out of 4 questions • Best 3 scores count
-        </p>
       </div>
     </div>
   );
