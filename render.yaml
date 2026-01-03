@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vite-react-shadcn
+    env: node
+    plan: free
+    nodeVersion: 22
+    buildCommand: npm run build
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: RENDER_USE_BUN
+        value: false
