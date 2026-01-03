@@ -77,10 +77,16 @@ export const clearCurrentPlayer = (): void => {
   localStorage.removeItem("ctf_current_player");
 };
 
+export const deleteLeaderboardEntry = (rollNo: string, completedAt: string): void => {
+  const leaderboard = getStoredLeaderboard();
+  const filtered = leaderboard.filter(entry => !(entry.rollNo === rollNo && entry.completedAt === completedAt));
+  localStorage.setItem("ctf_leaderboard", JSON.stringify(filtered));
+};
+
 export const exportToExcel = (data: LeaderboardEntry[]): void => {
   const headers = ["Rank", "Name", "Roll No", "PC No", "Phone No", "Score", "Time (seconds)", "Completed At"];
   const sortedData = [...data].sort((a, b) => b.score - a.score || a.time - b.time);
-  
+
   const csvContent = [
     headers.join(","),
     ...sortedData.map((entry, index) => [

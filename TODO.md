@@ -1,10 +1,11 @@
-# TODO: Add Admin Functionality to Leaderboard
+# Add Delete Access for Admin at Leaderboard
 
-## Steps to Complete
-- [ ] Add admin state management (isAdmin) with localStorage persistence
-- [ ] Create login form component with username and password fields
-- [ ] Implement credential validation (username: "capturetheflag", password: "8106736372")
-- [ ] Modify leaderboard display logic: full leaderboard for admin, restricted view for others
-- [ ] Integrate getCurrentPlayer to show only current user's entry for non-admin users
-- [ ] Add logout functionality for admin
-- [ ] Test admin login and leaderboard display for both admin and regular users
+## Tasks
+- [ ] Add deleteLeaderboardEntry function to src/lib/ctfData.ts
+- [ ] Import Trash2 icon from lucide-react in Leaderboard.tsx
+- [ ] Import AlertDialog components in Leaderboard.tsx
+- [ ] Add state for delete confirmation dialog in Leaderboard.tsx
+- [ ] Add delete button to each leaderboard entry row when isAdmin is true
+- [ ] Implement handleDelete function with confirmation dialog
+- [ ] Update entries state after successful deletion
+- [ ] Test the delete functionality

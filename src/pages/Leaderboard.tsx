@@ -12,15 +12,28 @@ import {
   Monitor,
   Phone,
   LogOut,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   getStoredLeaderboard,
   exportToExcel,
   LeaderboardEntry,
   getCurrentPlayer,
+  deleteLeaderboardEntry,
 } from "@/lib/ctfData";
 
 const Leaderboard = () => {
@@ -33,6 +46,7 @@ const Leaderboard = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [deleteEntry, setDeleteEntry] = useState<LeaderboardEntry | null>(null);
 
   useEffect(() => {
     const stored = getStoredLeaderboard();
@@ -60,6 +74,14 @@ const Leaderboard = () => {
     localStorage.removeItem("ctf_admin_logged_in");
     setUsername("");
     setPassword("");
+  };
+
+  const handleDelete = (entry: LeaderboardEntry) => {
+    deleteLeaderboardEntry(entry.rollNo, entry.completedAt);
+    const updated = getStoredLeaderboard();
+    const sorted = [...updated].sort((a, b) => b.score - a.score || a.time - b.time);
+    setEntries(sorted);
+    setDeleteEntry(null);
   };
 
   const getRankIcon = (rank: number) => {
@@ -382,7 +404,7 @@ const Leaderboard = () => {
                         className={`px-6 py-4 hover:bg-muted/30 transition-colors ${getRankBg(rank)}`}
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
-                        <div className="grid grid-cols-12 gap-4 items-center">
+                        <div className="grid grid-cols-13 gap-4 items-center">
                           <div className="col-span-1 flex justify-center">
                             {getRankIcon(rank)}
                           </div>
@@ -423,6 +445,36 @@ const Leaderboard = () => {
                             <span className="text-muted-foreground font-mono text-sm">
                               {entry.time.toFixed(1)}s
                             </span>
+                          </div>
+                          <div className="col-span-1 flex justify-center">
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Entry</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Are you sure you want to delete the entry for {entry.name} (Roll No: {entry.rollNo})? This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDelete(entry)}
+                                    className="bg-red-500 hover:bg-red-600"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
                           </div>
                         </div>
                       </div>
