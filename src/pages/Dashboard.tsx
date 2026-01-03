@@ -76,11 +76,20 @@ const Dashboard = () => {
 
       // For Round 3 (Header Challenge), validate dynamically via edge function
       if (questionId === "r3") {
+        if (!supabase) {
+          toast({
+            title: "Configuration Error",
+            description: "Supabase is not configured. Please check environment variables.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         try {
           const { data, error } = await supabase.functions.invoke('validate-flag', {
-            body: { 
-              pc_no: player.pcNo, 
-              submitted_identifier: answer.trim() 
+            body: {
+              pc_no: player.pcNo,
+              submitted_identifier: answer.trim()
             }
           });
 
@@ -323,7 +332,7 @@ const Dashboard = () => {
             Complete Round 1 → Unlock Round 2 → Unlock Round 3.
           </div>
           
-          {QUESTIONS.map((question, index) => {
+          {QUESTIONS.filter(q => q.id !== 'r3').map((question, index) => {
             // Unlock logic: R1 always open, R2 after R1 correct
             
             let isLocked = false;

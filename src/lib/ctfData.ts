@@ -44,14 +44,6 @@ export const QUESTIONS: Question[] = [
     hint: "above example f→c, r→o, g→d, h→e frgh->code",
     answer: "UNLOCK_STAGE",
     points: 10,
-  },
-  {
-    id: "r3",
-    title: "Header Challenge",
-    description: "🔐 Send a request to the /hidden endpoint with a special header to extract your unique flag.\n\n📌 Using curl:\ncurl -H \"X-Shadow-Token: open_sesame\" \"http://localhost:3001/api/hidden?team_id=your_pc_number\"\n\n📌 Using Postman:\n1. Create a GET request to http://localhost:3001/api/hidden?team_id=your_pc_number\n2. Add header: X-Shadow-Token: open_sesame\n3. Replace your_pc_number with your actual PC number\n\n📌 Server Response:\nA unique flag will be returned\n\n📌 Extract & Submit:\nSubmit the unique identifier returned by the server\n\n⚠️ Each PC number generates a UNIQUE flag identifier!",
-    hint: "Use curl or Postman to send the GET request. The header X-Shadow-Token must be exactly 'open_sesame'. Submit the unique identifier returned by the server.",
-    answer: "DYNAMIC",
-    points: 10,
   }
 ];
 

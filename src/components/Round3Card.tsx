@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 interface Round3CardProps {
   teamId: string;
   isLocked: boolean;
-  attempt?: { answer: string; correct: boolean; timestamp: number };
+  attempt?: { answer: string; correct: boolean; timestamp: number; hintUsed?: boolean };
   onComplete: (identifier: string, correct: boolean) => void;
   onHintUsed?: () => void;
   hintUsed?: boolean;
@@ -20,6 +20,8 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
   const [identifier, setIdentifier] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
+
+  const header = typeof window !== 'undefined' ? window.location.origin : '';
 
   const handleSubmit = async () => {
     if (!identifier.trim()) {
@@ -110,12 +112,12 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
         <div className="bg-blue-500/15 border border-blue-500/30 rounded-xl p-5 mb-4 font-mono text-base font-medium leading-relaxed">
           <h4 className="font-semibold mb-2">Instructions:</h4>
           <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
-            <li>Open the link <code className="bg-background px-1 py-0.5 rounded">/api/hidden?team_id={teamId}</code> in your browser and locate the token shown as X-XXXXX-Token.</li>
+            <li>Open the link <code className="bg-background px-1 py-0.5 rounded">/api/hidden?team_id={teamId}</code> in your browser and locate the token shown as X-Shadow-Token.</li>
             <li>Copy the token value exactly as displayed.</li>
             <li>Send a GET request using curl by placing the token into the header:</li>
           </ol>
           <pre className="bg-background p-2 rounded text-sm overflow-x-auto mt-2">
-            curl -H "X-XXXXX-Token: open_sesame" "/api/hidden?team_id={teamId}"
+            curl -H "X-Shadow-Token: open_sesame" "{header}/api/hidden?team_id={teamId}"
           </pre>
           <p className="text-sm text-muted-foreground mt-2">
             4. The response will contain a flag—extract and submit only the flag ID portion.
@@ -150,7 +152,7 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
                   <strong>Hint:</strong>
                 </div>
                 <pre className="bg-yellow-100 dark:bg-yellow-800 p-2 rounded text-xs overflow-x-auto">
-                  curl -H "X-XXXXX-Token: open_sesame" "/api/hidden?team_id=your_pc_number"
+                  curl -H "X-Shadow-Token: open_sesame" "https://your-deployment-url.vercel.app/api/hidden?team_id=your_pc_number"
                 </pre>
                 <div className="text-black font-semibold">
                   paste in cmd prompt
@@ -189,7 +191,7 @@ const Round3Card = ({ teamId, isLocked, attempt, onComplete, onHintUsed, hintUse
             {attempt.correct ? (
               <>
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-green-600">Correct: +{(attempt as any).hintUsed ? 5 : 10} points{(attempt as any).hintUsed ? " (hint used: -5)" : ""}</span>
+                <span className="text-green-600">Correct: +{attempt.hintUsed ? 5 : 10} points{attempt.hintUsed ? " (hint used: -5)" : ""}</span>
               </>
             ) : (
               <>
